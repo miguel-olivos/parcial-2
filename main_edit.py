@@ -7,6 +7,7 @@ archivo_eeg = None
 
 def menu_csv():
     global archivo_csv
+    # Se usa global para mantener la persistencia del objeto en el menú
     while True:
         print("\n--- Archivos CSV (SIATA) ---")
         print("1. Cargar archivo CSV")
