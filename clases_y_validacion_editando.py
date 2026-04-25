@@ -178,6 +178,7 @@ class ArchivoCSV:
 
         plt.tight_layout()
         self.guardar_figura("grafica_" + col + "_" + self.nombre[:-4] + ".png")
+        # Se generan 3 subplots para cumplir con el requerimiento de visualización triple
         plt.show()
 
     def operaciones(self):
