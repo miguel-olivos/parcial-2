@@ -252,90 +252,100 @@ class ArchivoSIATA:
 
 #________________________________________________________
 
-def procesar_fechas_y_remuestrear(self, columna_fecha='fecha_hora'):
-    """
-    Convierte columna de fechas a índice y realiza remuestreo
-    """
-#es necesario identificar la columna de fecha para poder convertirla a índice y realizar el remuestreo,
-#por eso se hace esta busqueda de posibles nombres de columnas que puedan contener fechas.
-    posibles_fechas = ['fecha_hora', 'fecha', 'date', 'datetime', 'tiempo', 'time']
-    col_fecha = None
-    
-    for posible in posibles_fechas:
-        if posible in self.datos.columns:
-            col_fecha = posible
-            break
-    
-#si no se encuentra la columna de fecha con los nombres comunes,
-# se verifica si el nombre proporcionado existe en el DataFrame, si es así se usa ese nombre para la fecha.
-    if col_fecha is None and columna_fecha in self.datos.columns:
-        col_fecha = columna_fecha
-    
-    if col_fecha is None:
-        print("No se encontró columna de fecha. Usando índice por defecto.")
-        return None
-    
-# Convertir a datetime y establecer como índice
-#se convierte la columna de fecha a formato datetime, si hay errores se convierten a NaT (Not a Time) 
-# y luego se eliminan esas filas.
+    def procesar_fechas_y_remuestrear(self, columna_fecha='fecha_hora'):
+        """
+        Convierte columna de fechas a índice y realiza remuestreo
+        """
+    #es necesario identificar la columna de fecha para poder convertirla a índice y realizar el remuestreo,
+    #por eso se hace esta busqueda de posibles nombres de columnas que puedan contener fechas.
+        posibles_fechas = ['fecha_hora', 'fecha', 'date', 'datetime', 'tiempo', 'time']
+        col_fecha = None
+        
+        for posible in posibles_fechas:
+            if posible in self.datos.columns:
+                col_fecha = posible
+                break
+        
+    #si no se encuentra la columna de fecha con los nombres comunes,
+    # se verifica si el nombre proporcionado existe en el DataFrame, si es así se usa ese nombre para la fecha.
+        if col_fecha is None and columna_fecha in self.datos.columns:
+            col_fecha = columna_fecha
+        
+        if col_fecha is None:
+            print("No se encontró columna de fecha. Usando índice por defecto.")
+            return None
+        
+    # Convertir a datetime y establecer como índice
+    #se convierte la columna de fecha a formato datetime, si hay errores se convierten a NaT (Not a Time) 
+    # y luego se eliminan esas filas.
 
-    self.datos[col_fecha] = pd.to_datetime(self.datos[col_fecha], errors='coerce')
-    self.datos = self.datos.dropna(subset=[col_fecha])
-    self.datos = self.datos.set_index(col_fecha)
-    self.datos = self.datos.sort_index()
-    
-    print(f"✓ Índice de fechas configurado usando '{col_fecha}'")
-    
-#se selecciona la primera columna numérica disponible para realizar el remuestreo,
-#si no hay columnas numéricas se muestra un mensaje y se retorna None.
+        self.datos[col_fecha] = pd.to_datetime(self.datos[col_fecha], errors='coerce')
+        self.datos = self.datos.dropna(subset=[col_fecha])
+        self.datos = self.datos.set_index(col_fecha)
+        self.datos = self.datos.sort_index()
+        
+        print(f"✓ Índice de fechas configurado usando '{col_fecha}'")
+        
+    #se selecciona la primera columna numérica disponible para realizar el remuestreo,
+    #si no hay columnas numéricas se muestra un mensaje y se retorna None.
 
-    columnas_numericas = self.datos.select_dtypes(include=[np.number]).columns
-    if len(columnas_numericas) == 0:
-        print("No hay columnas numéricas para remuestrear")
-        return None
-    
-    col_numerica = columnas_numericas[0]
-    print(f"Usando columna numérica: {col_numerica}")
-    
-#cada subplot muestra el remuestreo de la columna numérica seleccionada a diferentes frecuencias (diaria, mensual y trimestral).
-    fig, axes = plt.subplots(3, 1, figsize=(12, 10))
-    
-    #se hace el remuestreo diario, mensual y trimestral
-    #usando la función resample de pandas, se calcula la media para cada día y se grafica.
+        columnas_numericas = self.datos.select_dtypes(include=[np.number]).columns
+        if len(columnas_numericas) == 0:
+            print("No hay columnas numéricas para remuestrear")
+            return None
+        
+        col_numerica = columnas_numericas[0]
+        print(f"Usando columna numérica: {col_numerica}")
+        
+    #cada subplot muestra el remuestreo de la columna numérica seleccionada a diferentes frecuencias (diaria, mensual y trimestral).
+        fig, axes = plt.subplots(3, 1, figsize=(12, 10))
+        
+        #se hace el remuestreo diario, mensual y trimestral
+        #usando la función resample de pandas, se calcula la media para cada día y se grafica.
 
-    # Remuestreo DIARIO
-    diario = self.datos[col_numerica].resample('D').mean()
-    axes[0].plot(diario.index, diario.values, color='blue')
-    axes[0].set_title(f'Remuestreo Diario - {col_numerica}')
-    axes[0].set_ylabel('Valor')
-    axes[0].grid(True, alpha=0.3)
+        # Remuestreo DIARIO
+        diario = self.datos[col_numerica].resample('D').mean()
+        axes[0].plot(diario.index, diario.values, color='blue')
+        axes[0].set_title(f'Remuestreo Diario - {col_numerica}')
+        axes[0].set_ylabel('Valor')
+        axes[0].grid(True, alpha=0.3)
+        
+        # Remuestreo MENSUAL
+        mensual = self.datos[col_numerica].resample('M').mean()
+        axes[1].plot(mensual.index, mensual.values, color='red')
+        axes[1].set_title(f'Remuestreo Mensual - {col_numerica}')
+        axes[1].set_ylabel('Valor')
+        axes[1].grid(True, alpha=0.3)
+        
+        # 3. Remuestreo TRIMESTRAL
+        trimestral = self.datos[col_numerica].resample('Q').mean()
+        axes[2].plot(trimestral.index, trimestral.values, color='green')
+        axes[2].set_title(f'Remuestreo Trimestral - {col_numerica}')
+        axes[2].set_xlabel('Fecha')
+        axes[2].set_ylabel('Valor')
+        axes[2].grid(True, alpha=0.3)
+        
+        # Título general y guardado
+        # se le da un título general a la figura y se guarda automáticamente con un nombre 
+        # que incluye el nombre del archivo y el tipo de análisis.
+        plt.suptitle(f'Remuestreo de Datos - {self.nombre}', fontsize=14)
+        plt.tight_layout()
+        
+        nombre_archivo = f"{self.nombre}_remuestreo.png"
+        plt.savefig(nombre_archivo, dpi=150, bbox_inches='tight')
+        print(f"✓ Gráfico de remuestreo guardado como: {nombre_archivo}")
+        plt.close()
+        
+        return {'diario': diario, 'mensual': mensual, 'trimestral': trimestral}
     
-    # Remuestreo MENSUAL
-    mensual = self.datos[col_numerica].resample('M').mean()
-    axes[1].plot(mensual.index, mensual.values, color='red')
-    axes[1].set_title(f'Remuestreo Mensual - {col_numerica}')
-    axes[1].set_ylabel('Valor')
-    axes[1].grid(True, alpha=0.3)
-    
-    # 3. Remuestreo TRIMESTRAL
-    trimestral = self.datos[col_numerica].resample('Q').mean()
-    axes[2].plot(trimestral.index, trimestral.values, color='green')
-    axes[2].set_title(f'Remuestreo Trimestral - {col_numerica}')
-    axes[2].set_xlabel('Fecha')
-    axes[2].set_ylabel('Valor')
-    axes[2].grid(True, alpha=0.3)
-    
-    # Título general y guardado
-    # se le da un título general a la figura y se guarda automáticamente con un nombre 
-    # que incluye el nombre del archivo y el tipo de análisis.
-    plt.suptitle(f'Remuestreo de Datos - {self.nombre}', fontsize=14)
-    plt.tight_layout()
-    
-    nombre_archivo = f"{self.nombre}_remuestreo.png"
-    plt.savefig(nombre_archivo, dpi=150, bbox_inches='tight')
-    print(f"✓ Gráfico de remuestreo guardado como: {nombre_archivo}")
-    plt.close()
-    
-    return {'diario': diario, 'mensual': mensual, 'trimestral': trimestral}
+
+    def copiar_datos(self):
+        """
+        Retorna una copia de los datos para no modificar el original
+        """
+        return self.datos.copy()
 
 #________________________________________________________
+
+
+
