@@ -16,6 +16,7 @@ def menu_csv():
         print("5. Operaciones (apply, map, suma/resta)")
         print("6. Graficar remuestreo (diario, mensual, trimestral)")
         print("0. Volver")
+        print("-" * 30)
 
         op = input("Opcion: ").strip()
 
@@ -53,6 +54,7 @@ def menu_eeg():
         print("3. Sumar 3 canales y graficar")
         print("4. Promedio y desviacion estandar (stem)")
         print("0. Volver")
+        print("-" * 30)
 
         op = input("Opcion: ").strip()
 
@@ -83,6 +85,7 @@ def menu_almacen():
         print("1. Ver objetos guardados")
         print("2. Buscar un objeto")
         print("0. Volver")
+        print("-" * 30)
 
         op = input("Opcion: ").strip()
 
@@ -104,6 +107,7 @@ def main():
         print("2. Archivos EEG (.mat - electroencefalografia)")
         print("3. Almacen de objetos")
         print("0. Salir")
+        print("-" * 30)
 
         op = input("Opcion: ").strip()
 
