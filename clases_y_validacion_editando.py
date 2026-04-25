@@ -259,6 +259,9 @@ class ArchivoCSV:
 
 
 class ArchivoEEG:
+    # Esta clase permite procesar archivos .mat de Parkinson y Control
+# detectando automáticamente la matriz de datos y ajustando sus dimensiones.
+    
     #clase para manejar archivos .mat de EEG (Control y Parkinson)
     #frecuencia de muestreo de 1000 Hz
 
