@@ -381,6 +381,7 @@ class ArchivoEEG:
         ruta = os.path.join(carpeta, nombre)
         plt.savefig(ruta)
         print("Grafica guardada en:", ruta)
+        # El guardado automático asegura que los resultados estén disponibles para informes posteriores
 
 #________________________________________________________
 
